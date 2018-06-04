@@ -115,7 +115,6 @@ def str_to_num(row):
         return float(row)
 
 if __name__ == "__main__":
-    %%time
     file_path = 'https://s3-us-west-2.amazonaws.com/businesspredictiondata/business.json'
     yelp_business_data = pd.read_json(file_path,lines=True)
 
@@ -302,7 +301,10 @@ if __name__ == "__main__":
 
     columns_to_remove = ['attributes','categories','hours','flat_attributes',
                          'one_star_text','two_to_four_star_text','five_star_text',
-                         'categories']
+                         'categories','White alone, Not Hispanic or Latino',
+                         'Attribute|Alcohol value:', 'Attribute|RestaurantsAttire value:',
+                         'Attribute|NoiseLevel value:', 'Attribute|WiFi value:',
+                         'Attribute|Smoking value:']
 
     restaurants_with_reviews.drop(columns_to_remove,axis=1,inplace=True)
 
