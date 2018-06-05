@@ -14,6 +14,11 @@ pd.set_option('display.max_rows', 500)
 
 
 def rf_best_features(df, x_cols, n_features, true_col='closed_on_google'):
+    '''
+    INPUT: dataframe, input columns, number of top features to return,
+    and optionally the name of the target column
+    OUTPUT: a tuple of the top N features and their corresponding values
+    '''
 
     x_columns = df[x_cols]
 
@@ -39,6 +44,11 @@ def rf_best_features(df, x_cols, n_features, true_col='closed_on_google'):
 
 
 def plot_roc(model, x_columns, y_true, title="model type"):
+    '''
+    INPUT: fitted model, array of x values, array of target values, optional:
+    title of outputted figure
+    OUTPUT: ROC curve with AUC value
+    '''
 
     y_pred = model.predict_proba(x_columns)
 
@@ -66,6 +76,11 @@ def plot_roc(model, x_columns, y_true, title="model type"):
 
 
 def get_best_features(model, x_cols, n_features):
+    '''
+    INPUT: fitted model, list of all x columns in model, number of features
+    to return
+    OUTPUT: tuple of top N features and their associated values
+    '''
 
     feature_importances = {}
 
@@ -83,6 +98,12 @@ def get_best_features(model, x_cols, n_features):
 
 
 def plot_best_features(values, features, name, n_features=10, figsize_x=10, figsize_y=10):
+    '''
+    INPUT: list of values, list of features, name/title of plot, optional:
+    number of features, x and y size of the figure
+    title of outputted figure
+    OUTPUT: ROC curve with AUC value
+    '''
 
     values = values[:n_features]
 

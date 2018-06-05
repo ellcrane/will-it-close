@@ -21,6 +21,10 @@ def is_food(item):
 
 
 def flatten_dict(row):
+    '''
+    INPUT: cell from pandas dataframe with nested dictionairies
+    OUTPUT: non-nested dictionairies
+    '''
     out = {}
     for key, value in row.items():
         if type(value) != dict:
@@ -33,6 +37,10 @@ def flatten_dict(row):
 
 
 def make_exists_function(key):
+    '''
+    INPUT: cell from pandas dataframe
+    OUTPUT: dictionary value
+    '''
     def get_key_if_exists(row):
         if key in row:
             return row[key]
@@ -42,6 +50,11 @@ def make_exists_function(key):
 
 
 def add_restaurant_count_column(dataframe):
+    '''
+    INPUT: dataframe
+    OUTPUT: dataframe with column that shows frequency that restaurant is
+    in the dataset
+    '''
     restaurant_frequency = dataframe.groupby(
         ['name']).count().sort_values('address', ascending=False)
 
@@ -57,6 +70,10 @@ def add_restaurant_count_column(dataframe):
 
 
 def closed_on_google(row):
+    '''
+    INPUT: cell from pandas dataframe
+    OUTPUT: parses through google maps api data to get closed status
+    '''
     try:
         return row[0]['permanently_closed']
     except:
@@ -64,12 +81,20 @@ def closed_on_google(row):
 
 
 def fix_percent(row):
+    '''
+    INPUT: cell from pandas dataframe as percentage
+    OUTPUT: float of percentage without mod symbol
+    '''
     row = str(row).strip('%')
     row = float(row)
     return row/100
 
 
 def summaries_from_google(dataframe, key, default_val=0):
+    '''
+    INPUT: dataframe with data on nearby restaurants (from google maps api)
+    OUTPUT: summary data of nearby restaurants
+    '''
     summaries = []
     key_errors = 0
     for i in range(len(dataframe)):
@@ -91,6 +116,10 @@ def summaries_from_google(dataframe, key, default_val=0):
 
 
 def get_price(row):
+    '''
+    INPUT: cell from pandas dataframe that is a dictionary
+    OUTPUT: price value in dictionairy, or 1.5, which is the average price
+    '''
     try:
         return row['RestaurantsPriceRange2']
     except KeyError:
@@ -98,6 +127,12 @@ def get_price(row):
 
 
 def concat_unique_columns(df1, df2, suffix):
+    '''
+    INPUT: two dataframes and a suffix for column names. Dataframes should have
+    some of the same columns.
+    OUTPUT: a dataframe with the unique columns from the dataframes, with
+    the suffix attached.
+    '''
     cols = list(set(list(df1.columns) + list(df2.columns)))
     df_dict = {'df1': [], 'df2': []}
     for col in cols:
@@ -111,6 +146,12 @@ def concat_unique_columns(df1, df2, suffix):
 
 
 def get_zipped_postcode_data_from_s3_bucket(postcodes):
+    '''
+    INPUT: list of zip codes
+    OUTPUT: list of dictionairies with economic data on each zip code
+    *Note: This bucket only has the postcodes used for these restaurants, which
+    is about 600 zip codes.
+    '''
     s3 = boto3.client('s3')
     zip_code_data = []
     for code in postcodes:
@@ -127,6 +168,10 @@ def get_zipped_postcode_data_from_s3_bucket(postcodes):
 
 
 def str_to_num(row):
+    '''
+    INPUT: cell from pandas dataframe
+    OUTPUT: int or float value of cell
+    '''
     try:
         return int(row)
     except ValueError:
