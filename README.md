@@ -11,6 +11,8 @@ But from this tragedy I found an opportunity.
 <img src="images/2_the_problem.png" width="600"/>
 I thought that if I could accurately predict restaurant closure, that would provide valuable information to stakeholders, such as investors, that need a risk assessment of a restaurant. The closing probability predictions were made on restaurant data from May 2018 and deployed at [www.willitclose.com](www.willitclose.com)
 
+If you would like to repeat this project on your computer, read "DIRECTIONS.MD"
+
 ## Overview
 - Data sources:
 	- Yelp academic dataset
@@ -79,7 +81,7 @@ I thought that economic data about the location in which the restaurant was loca
 ### Google Maps Nearby Data/API
 <!-- ![Google maps](images/11_google_maps_nearby.png) -->
 <img src="images/11_google_maps_nearby.png" width="600"/>
-I also thought that information on a restaurant’s competitiveness, such as the density in that area, or the average price/star-rating of its neighbors would be relevant. I used the Google Maps Places API to get that data, and also engineered features such as restaurant rating minus the average rating of nearby restaurants. 
+I also thought that information on a restaurant’s competitiveness, such as the density in that area, or the average price/star-rating of its neighbors would be relevant. I used the Google Maps Places API to get that data, and also engineered features such as restaurant rating minus the average rating of nearby restaurants.
 
 ## Modeling
 <!-- ![Models used](images/12_modeling.png) -->
