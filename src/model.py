@@ -8,6 +8,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import roc_curve, auc
 import matplotlib.pyplot as plt
 from collections import Counter
+import os
 pd.set_option('display.max_columns', 200)
 pd.set_option('display.max_rows', 500)
 
@@ -35,7 +36,7 @@ def rf_best_features(df, x_cols, n_features, true_col='closed_on_google'):
     features = [feature[0] for feature in top_features]
 
     return values, features
-    
+
 def plot_roc(model, x_columns, y_true, title="model type"):
 
     y_pred = model.predict_proba(x_columns)
@@ -59,7 +60,8 @@ def plot_roc(model, x_columns, y_true, title="model type"):
     plt.ylim([0, 1])
     plt.ylabel('True Positive Rate')
     plt.xlabel('False Positive Rate')
-    plt.show()
+    plt.savefig(f'../plots/{model_name} ROC')
+    plt.close()
 
 def get_best_features(model, x_cols, n_features):
 
@@ -78,7 +80,7 @@ def get_best_features(model, x_cols, n_features):
     return values, features
 
 
-def plot_best_features(values, features, n_features=10, figsize_x=10, figsize_y=10):
+def plot_best_features(values, features, name, n_features=10, figsize_x=10, figsize_y=10):
 
     values = values[:n_features]
 
@@ -86,12 +88,17 @@ def plot_best_features(values, features, n_features=10, figsize_x=10, figsize_y=
 
     new_df = pd.DataFrame(list(zip(values,features))).set_index(1).sort_values(0)
 
-    new_df.plot.barh(figsize=(figsize_x,figsize_y), fontsize=80)
+    plot = new_df.plot.barh(figsize=(figsize_x,figsize_y), fontsize=100, title=name)
+    plot.title.set_size(100)
+    fig = plot.get_figure()
 
-    new_df.show()
-
+    fig.savefig(f'../plots/{name}')
 
 if __name__ == '__main__':
+    if not os.path.exists('../plots'):
+        os.makedirs('../plots')
+        print("Plots folder created.")
+
     try:
         df = pd.read_json('../data/featurized_dataframe.json')
         print("Dataframe read from local .json")
@@ -151,37 +158,43 @@ if __name__ == '__main__':
 
     X_train, X_test, y_train, y_test = train_test_split(x_df, y_df, test_size=0.33, random_state=10)
 
+    print("Fitting, testing, and creating/saving figs for 4 classifiers...")
     rf_model = RandomForestClassifier(n_estimators=100)
     rf_model.fit(X_train, y_train)
     plot_roc(rf_model, X_test, y_test)
     best_values, best_features = get_best_features(rf_model, X_test.columns, 10)
-    plot_best_features(best_values, best_features, 10, 100, 50)
+    plot_best_features(best_values, best_features, "Best Features for Random Forest",
+                       10, 100, 50)
 
     gb_model = GradientBoostingClassifier(n_estimators=100)
     gb_model.fit(X_train, y_train)
     plot_roc(gb_model, X_test, y_test)
     best_values, best_features = get_best_features(gb_model, X_test.columns, 10)
-    plot_best_features(best_values, best_features, 10, 100, 50)
+    plot_best_features(best_values, best_features, "Best Features for Gradient Boost",
+                       10, 100, 50)
 
     dt_model = DecisionTreeClassifier()
     dt_model.fit(X_train, y_train)
     plot_roc(dt_model, X_test, y_test)
     best_values, best_features = get_best_features(dt_model, X_test.columns, 10)
-    plot_best_features(best_values, best_features, 10, 100, 50)
+    plot_best_features(best_values, best_features, "Best Features for Decision Tree",
+                       10, 100, 50)
 
     ab_model = AdaBoostClassifier()
     ab_model.fit(X_train, y_train)
     plot_roc(ab_model, X_test, y_test)
     best_values, best_features = get_best_features(ab_model, X_test.columns, 10)
-    plot_best_features(best_values, best_features, 10, 100, 50)
+    plot_best_features(best_values, best_features, "Best Features for Ada Boost",
+                       10, 100, 50)
 
+    print("Plotting best features within each column group...")
     for key, columns in x_column_sets.items():
         gb_model = GradientBoostingClassifier(n_estimators=100)
         gb_model.fit(X_train[columns], y_train)
         plot_roc(gb_model, X_test[columns], y_test, title=key + " Columns")
         best_values, best_features = get_best_features(gb_model, X_test[columns].columns, 10)
-        print(f"Feature Importances for {key}")
-        plot_best_features(best_values, best_features, 10, 100, 50)
+        plot_best_features(best_values, best_features, f"Feature Importances for {key}",
+                           10, 100, 50)
 
     all_values, all_features = get_best_features(gb_model, all_columns, len(all_columns))
 
@@ -201,6 +214,8 @@ if __name__ == '__main__':
         for v in values:
             feature_category_values[key] += feature_value_pairs[v]
 
-    print("Feature Importances by Category")
+    plot_best_features(list(feature_category_values.values()),list(feature_category_values.keys()),
+                       "Feature Importances by Category", 10, 100, 50)
 
-    plot_best_features(list(feature_category_values.values()),list(feature_category_values.keys()), 10, 100, 50)
+    print("All models fit and tested successfully! Check the \'plots\' folder\
+          one level up to see the results.")

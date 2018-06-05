@@ -3,6 +3,8 @@
 import pandas as pd
 from collections import Counter
 import boto3
+from sklearn.feature_extraction.text import TfidfVectorizer
+import os
 
 def is_food(item):
     '''
@@ -115,6 +117,10 @@ def str_to_num(row):
         return float(row)
 
 if __name__ == "__main__":
+    if not os.path.exists('../data'):
+        os.makedirs('../data')
+        print("Data folder created.")
+
     file_path = 'https://s3-us-west-2.amazonaws.com/businesspredictiondata/business.json'
     yelp_business_data = pd.read_json(file_path,lines=True)
 
