@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier, \
-AdaBoostClassifier, GradientBoostingClassifier
+    AdaBoostClassifier, GradientBoostingClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
@@ -11,6 +11,7 @@ from collections import Counter
 import os
 pd.set_option('display.max_columns', 200)
 pd.set_option('display.max_rows', 500)
+
 
 def rf_best_features(df, x_cols, n_features, true_col='closed_on_google'):
 
@@ -28,7 +29,6 @@ def rf_best_features(df, x_cols, n_features, true_col='closed_on_google'):
 
         feature_importances[x_columns.columns[i]] = rf_model.feature_importances_[i]
 
-
     top_features = Counter(feature_importances).most_common(n_features)
 
     values = [feature[1] for feature in top_features]
@@ -37,11 +37,12 @@ def rf_best_features(df, x_cols, n_features, true_col='closed_on_google'):
 
     return values, features
 
+
 def plot_roc(model, x_columns, y_true, title="model type"):
 
     y_pred = model.predict_proba(x_columns)
 
-    fpr, tpr, threshold = roc_curve(y_true, y_pred[:,1])
+    fpr, tpr, threshold = roc_curve(y_true, y_pred[:, 1])
     area_under_curve = auc(fpr, tpr)
 
     # method I: plt
@@ -52,16 +53,17 @@ def plot_roc(model, x_columns, y_true, title="model type"):
         model_name = title
 
     plt.title(f'{model_name} ROC')
-    ax.plot(fpr, tpr, 'k', label = 'C AUC = %0.3f' % area_under_curve)
+    ax.plot(fpr, tpr, 'k', label='C AUC = %0.3f' % area_under_curve)
 
-    ax.legend(loc = 'lower right')
-    ax.plot([0, 1], [0, 1],'r--')
+    ax.legend(loc='lower right')
+    ax.plot([0, 1], [0, 1], 'r--')
     plt.xlim([0, 1])
     plt.ylim([0, 1])
     plt.ylabel('True Positive Rate')
     plt.xlabel('False Positive Rate')
     plt.savefig(f'../plots/{model_name} ROC')
     plt.close()
+
 
 def get_best_features(model, x_cols, n_features):
 
@@ -86,13 +88,14 @@ def plot_best_features(values, features, name, n_features=10, figsize_x=10, figs
 
     features = features[:n_features]
 
-    new_df = pd.DataFrame(list(zip(values,features))).set_index(1).sort_values(0)
+    new_df = pd.DataFrame(list(zip(values, features))).set_index(1).sort_values(0)
 
-    plot = new_df.plot.barh(figsize=(figsize_x,figsize_y), fontsize=100, title=name)
+    plot = new_df.plot.barh(figsize=(figsize_x, figsize_y), fontsize=100, title=name)
     plot.title.set_size(100)
     fig = plot.get_figure()
 
     fig.savefig(f'../plots/{name}')
+
 
 if __name__ == '__main__':
     if not os.path.exists('../plots'):
@@ -105,52 +108,54 @@ if __name__ == '__main__':
     except ValueError:
         print("Dataframe json being read from s3. Consider running \'featurize.py\' first if you'll be running this\
                 multiple times.")
-        df = pd.read_json('https://s3-us-west-2.amazonaws.com/businesspredictiondata/featurized_dataframe.json')
+        df = pd.read_json(
+            'https://s3-us-west-2.amazonaws.com/businesspredictiondata/featurized_dataframe.json')
 
-    yelp_basic = ['restaurant_count','restaurant_count > 1','restaurant_count > 5',
-                    'restaurant_count > 25','review_count','stars']
+    yelp_basic = ['restaurant_count', 'restaurant_count > 1', 'restaurant_count > 5',
+                  'restaurant_count > 25', 'review_count', 'stars']
 
     yelp_categories = [col for col in df.columns if col.startswith('Category')]
 
     yelp_attributes = [col for col in df.columns if col.startswith('Attribute')]
 
-    yelp_review_prefixes = ('one_star','two_to_four_star','five_star')
+    yelp_review_prefixes = ('one_star', 'two_to_four_star', 'five_star')
     yelp_review_features = [col for col in df.columns if col.startswith(yelp_review_prefixes)]
     top_yelp_review_features = rf_best_features(df, yelp_review_features, 100)[1]
 
     all_yelp_columns = yelp_basic + yelp_attributes + yelp_categories + top_yelp_review_features
 
-    google_maps_nearby_columns = ['avg_price_level','avg_rating','num_nearby_restaurants','relative rating',
-                                'price_level','relative_price']
+    google_maps_nearby_columns = ['avg_price_level', 'avg_rating', 'num_nearby_restaurants', 'relative rating',
+                                  'price_level', 'relative_price']
 
     census_columns = ['2016 ACS 5-Year Population Estimate',
-                     'American Indian and Alaska Native alone',
-                     'Asian alone',
-                     'Black or African American alone',
-                     'Census 2010 Total Population',
-                     'Educational Attainment: Percent high school graduate or higher',
-                     'Foreign Born Population',
-                     'Hispanic or Latino (of any race)',
-                     'Individuals below poverty level',
-                     'Median Age',
-                     'Median Household Income',
-                     'Native Hawaiian and Other Pacific Islander alone',
-                     'Some Other Race alone',
-                     'Total housing units',
-                     'Two or More Races',
-                     'Veterans',
-                     'White alone']
+                      'American Indian and Alaska Native alone',
+                      'Asian alone',
+                      'Black or African American alone',
+                      'Census 2010 Total Population',
+                      'Educational Attainment: Percent high school graduate or higher',
+                      'Foreign Born Population',
+                      'Hispanic or Latino (of any race)',
+                      'Individuals below poverty level',
+                      'Median Age',
+                      'Median Household Income',
+                      'Native Hawaiian and Other Pacific Islander alone',
+                      'Some Other Race alone',
+                      'Total housing units',
+                      'Two or More Races',
+                      'Veterans',
+                      'White alone']
 
-    info_columns = ['name','city','state','postal_code','address','business_id','latitude','longitude','neighborhood']
+    info_columns = ['name', 'city', 'state', 'postal_code', 'address',
+                    'business_id', 'latitude', 'longitude', 'neighborhood']
 
     all_columns = all_yelp_columns + google_maps_nearby_columns + census_columns
 
     print("Column groups created")
 
-    x_column_sets = {'Yelp Basic':yelp_basic, 'Yelp Categories':yelp_categories,
-                    'Yelp Attributes':yelp_attributes,'Top Yelp Review':top_yelp_review_features,
-                    'Google Maps Nearby':google_maps_nearby_columns,'All Yelp':all_yelp_columns,
-                    'Census - Economic Data by Zip Code':census_columns, 'All': all_columns}
+    x_column_sets = {'Yelp Basic': yelp_basic, 'Yelp Categories': yelp_categories,
+                     'Yelp Attributes': yelp_attributes, 'Top Yelp Review': top_yelp_review_features,
+                     'Google Maps Nearby': google_maps_nearby_columns, 'All Yelp': all_yelp_columns,
+                     'Census - Economic Data by Zip Code': census_columns, 'All': all_columns}
 
     x_df = df[x_column_sets['All']]
 
@@ -198,15 +203,15 @@ if __name__ == '__main__':
 
     all_values, all_features = get_best_features(gb_model, all_columns, len(all_columns))
 
-    feature_dict = {'Yelp Basic':x_column_sets['Yelp Basic'], 'Yelp Categories':x_column_sets['Yelp Categories'], \
-                    'Yelp Attributes':x_column_sets['Yelp Attributes'],
-                    'Yelp Reviews':x_column_sets['Top Yelp Review'],
-                     'Google Maps Nearby':x_column_sets['Google Maps Nearby'],
-                   'Census - Economic Data by Zip Code':x_column_sets['Census - Economic Data by Zip Code']}
-    feature_category_values = {'Yelp Basic':0, 'Yelp Categories':0, \
-                    'Yelp Attributes':0,'Yelp Reviews':0,
-                     'Google Maps Nearby':0,
-                   'Census - Economic Data by Zip Code':0}
+    feature_dict = {'Yelp Basic': x_column_sets['Yelp Basic'], 'Yelp Categories': x_column_sets['Yelp Categories'],
+                    'Yelp Attributes': x_column_sets['Yelp Attributes'],
+                    'Yelp Reviews': x_column_sets['Top Yelp Review'],
+                    'Google Maps Nearby': x_column_sets['Google Maps Nearby'],
+                    'Census - Economic Data by Zip Code': x_column_sets['Census - Economic Data by Zip Code']}
+    feature_category_values = {'Yelp Basic': 0, 'Yelp Categories': 0,
+                               'Yelp Attributes': 0, 'Yelp Reviews': 0,
+                               'Google Maps Nearby': 0,
+                               'Census - Economic Data by Zip Code': 0}
 
     feature_value_pairs = dict(list(zip(all_features, all_values)))
 
@@ -214,7 +219,7 @@ if __name__ == '__main__':
         for v in values:
             feature_category_values[key] += feature_value_pairs[v]
 
-    plot_best_features(list(feature_category_values.values()),list(feature_category_values.keys()),
+    plot_best_features(list(feature_category_values.values()), list(feature_category_values.keys()),
                        "Feature Importances by Category", 10, 100, 50)
 
     print("All models fit and tested successfully! Check the \'plots\' folder\
