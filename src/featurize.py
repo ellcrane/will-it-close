@@ -7,6 +7,18 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import os
 
 
+def get_dataframe_from_s3_json(bucket_name, key_name, multi_line=True):
+    '''
+    INPUT: s3 bucket name and key name
+    OUTPUT: dataframe of from s3 .json file
+    '''
+    client = boto3.client("s3")
+    result = client.get_object(Bucket=bucket_name, Key=key_name)
+    # Read the object (not compressed):
+    dataframe = pd.read_json(result["Body"].read().decode(), lines=multi_line)
+    return dataframe
+
+
 def is_food(item):
     '''
     INPUT: cell from pandas dataframe
@@ -183,11 +195,11 @@ if __name__ == "__main__":
         os.makedirs('../data')
         print("Data folder created.")
 
-    file_path = 'https://s3-us-west-2.amazonaws.com/businesspredictiondata/business.json'
-    yelp_business_data = pd.read_json(file_path, lines=True)
+    print("Reading basic business data from s3 bucket...")
+    yelp_business_data = get_dataframe_from_s3_json("businesspredictiondata",
+                                                    "business.json", multi_line=True)
 
     print("Cutting down yelp data to only open US restaurants...")
-
     # filters businesses that were open when this dataset was published Jan. 2018
     open_businesses = yelp_business_data[yelp_business_data['is_open'] == 1].drop_duplicates([
                                                                                              'name', 'address'])
@@ -240,8 +252,8 @@ if __name__ == "__main__":
     previously_open_US_restaurants['restaurant_count > 25'] = previously_open_US_restaurants['restaurant_count'] > 25
 
     print("Downloading updated open/closed on google data...")
-    updated_google_df = pd.read_json(
-        'https://s3-us-west-2.amazonaws.com/businesspredictiondata/updated_google_data.json')
+    updated_google_df = get_dataframe_from_s3_json(
+        "businesspredictiondata", "updated_google_data.json", multi_line=False)
 
     updated_google_df['closed_on_google'] = updated_google_df['results'].apply(closed_on_google)
 
@@ -296,8 +308,9 @@ if __name__ == "__main__":
         restaurants_with_economic_data[col] = restaurants_with_economic_data[col].apply(str_to_num)
 
     print("Downloading google nearby data...")
-    google_nearby_df = pd.read_json(
-        'https://s3-us-west-2.amazonaws.com/businesspredictiondata/google_nearby.json')
+    google_nearby_df = get_dataframe_from_s3_json("businesspredictiondata",
+                                                  "google_nearby.json",
+                                                  multi_line=False)
     google_nearby_df['num_nearby_restaurants'] = google_nearby_df['results'].apply(len)
 
     google_nearby_df.reset_index(inplace=True)
@@ -322,9 +335,9 @@ if __name__ == "__main__":
         restaurants_with_nearby_data['avg_price_level']
 
     print("Downloading review data...")
-
-    reviews_df = pd.read_json(
-        'https://s3-us-west-2.amazonaws.com/businesspredictiondata/small_review_df.json')
+    reviews_df = get_dataframe_from_s3_json("businesspredictiondata",
+                                            "small_review_df.json",
+                                            multi_line=False)
 
     restaurants_with_stars = restaurants_with_nearby_data.merge(
         reviews_df, how='left', on='business_id')
