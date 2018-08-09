@@ -128,8 +128,6 @@ Data Scientist
 
 [www.willitclose.com](http://www.willitclose.com)
 
-<ellcrane@gmail.com>
-
 [linkedin.com/in/ellcrane](https://www.linkedin.com/in/ellcrane/)
 
 [github.com/ellcrane](https://github.com/ellcrane)
