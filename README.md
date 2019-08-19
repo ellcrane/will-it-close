@@ -1,5 +1,4 @@
 # Predicting Restaurant Closure
-## Will It Close? - [www.WillitClose.com](http://www.willitclose.com)
 ## [Watch the presentation on Youtube](https://www.youtube.com/watch?v=te4h5v2pU8M)
 
 ## About this project
