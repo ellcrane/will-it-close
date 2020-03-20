@@ -8,7 +8,7 @@ I ***love*** Mongolian grill. So I was heartbroken to find out that my favorite 
 But from this tragedy I found an opportunity.
 <!-- ![Opportunity](images/2_the_problem.png) -->
 <img src="images/2_the_problem.png" width="600"/>
-At the same time, I saw an opportunity. I thought that if I could accurately predict restaurant closure, that would provide valuable information to stakeholders, such as investors, that need a risk assessment of a restaurant. The closing probability predictions were made on restaurant data from May 2018 and deployed at [www.willitclose.com](www.willitclose.com)
+I thought that if I could accurately predict restaurant closure, that would provide valuable information to stakeholders, such as investors, that need a risk assessment of a restaurant. The closing probability predictions were made on restaurant data from May 2018.
 
 If you would like to repeat this project on your computer, follow the readme: *DIRECTIONS.MD*
 
